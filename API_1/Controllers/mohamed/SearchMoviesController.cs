@@ -195,65 +195,65 @@ namespace API_1.Controllers
             var items = JsonConvert.DeserializeObject<TheMovieDBMovieSearch.RootObject>(jsonString);
 
             //POUR CHAQUE FILM, AJOUTER EN BDD LOCAL SI IL N'EXISTE PAS
-            for (int i = 0; i < items.results.Count; i++)
-            {
-                string Titre = items.results[i].title;
-                string synopsis = items.results[i].overview;
-                string dateSortie = items.results[i].release_date;
-                string Url_Affiche = items.results[i].poster_path == null ? string.Empty : items.results[i].poster_path;
+            //for (int i = 0; i < items.results.Count; i++)
+            //{
+            //    string Titre = items.results[i].title;
+            //    string synopsis = items.results[i].overview;
+            //    string dateSortie = items.results[i].release_date;
+            //    string Url_Affiche = items.results[i].poster_path == null ? string.Empty : items.results[i].poster_path;
 
-                Dictionary<string, string> parameters = new Dictionary<string, string>();
-                parameters.Add("Titre", Titre);
-                var currentResult = DataBase.select("SELECT Titre FROM Films WHERE Titre = @Titre",
-                                        parameters);
-                if (currentResult.Rows.Count == 0)
-                {
-                    //FAIRE LA REQUETE API DISTANCE NUMERO 2
-                    var itemDetails = apiGetDetails(items.results[i].id);
+            //    Dictionary<string, string> parameters = new Dictionary<string, string>();
+            //    parameters.Add("Titre", Titre);
+            //    var currentResult = DataBase.select("SELECT Titre FROM Films WHERE Titre = @Titre",
+            //                            parameters);
+            //    if (currentResult.Rows.Count == 0)
+            //    {
+            //        //FAIRE LA REQUETE API DISTANCE NUMERO 2
+            //        var itemDetails = apiGetDetails(items.results[i].id);
 
-                    //FAIRE REQUETE API DISTANTE POUR RECUPERER L'URL BANDE ANNONCE
-                    var itemVideo = apiGetVideo(items.results[i].id);
+            //        //FAIRE REQUETE API DISTANTE POUR RECUPERER L'URL BANDE ANNONCE
+            //        var itemVideo = apiGetVideo(items.results[i].id);
 
-                    string duree = string.Empty;
-                    if (itemDetails.runtime != null)
-                        duree = Convert.ToInt32(itemDetails.runtime).ToString();
+            //        string duree = string.Empty;
+            //        if (itemDetails.runtime != null)
+            //            duree = Convert.ToInt32(itemDetails.runtime).ToString();
 
-                    string url_BandeAnnoce = string.Empty;
-                    if (itemVideo.results.Count > 0)
-                    {
-                        if (itemVideo.results[0].site == "YouTube")
-                            url_BandeAnnoce = "https://www.youtube.com/watch?v=" + itemVideo.results[0].key;
-                    }
+            //        string url_BandeAnnoce = string.Empty;
+            //        if (itemVideo.results.Count > 0)
+            //        {
+            //            if (itemVideo.results[0].site == "YouTube")
+            //                url_BandeAnnoce = "https://www.youtube.com/watch?v=" + itemVideo.results[0].key;
+            //        }
 
-                    string Id_Genre = "-1";
-                    if (itemDetails.genres.Count > 0)
-                        Id_Genre = itemDetails.genres[0].id.ToString();
+            //        string Id_Genre = "-1";
+            //        if (itemDetails.genres.Count > 0)
+            //            Id_Genre = itemDetails.genres[0].id.ToString();
 
-                    //AJOUT DU FILM EN DBB
-                    DataBase.AddMovie(Titre, synopsis, dateSortie, duree, Url_Affiche, url_BandeAnnoce, Id_Genre);
-                }
-            }
+            //        //AJOUT DU FILM EN DBB
+            //        DataBase.AddMovie(Titre, synopsis, dateSortie, duree, Url_Affiche, url_BandeAnnoce, Id_Genre);
+            //    }
+            //}
 
-            //RECUP LES FILMS DANS NOTRE BDD ET RETOURNE LA LISTE DES FILMS
-            Dictionary<string, string> resultsParameters = new Dictionary<string, string>();
-            var results = DataBase.select("SELECT * FROM Films WHERE Titre LIKE '%" + query + "%'",
-                                           resultsParameters);
-            RootObject rootObject = new RootObject();
-            for (int i = 0; i < results.Rows.Count; i++)
-            {
-                string Titre = results.Rows[i][1].ToString();
-                string synopsis = results.Rows[i][2].ToString();
-                string dateSortie = results.Rows[i][3].ToString();
-                int duree = Convert.ToInt32(results.Rows[i][4]);
-                string Url_Affiche = results.Rows[i][5].ToString();
-                string url_BandeAnnoce = results.Rows[i][6].ToString();
-                int Id_genre = Convert.ToInt32(results.Rows[i][7]);
+            ////RECUP LES FILMS DANS NOTRE BDD ET RETOURNE LA LISTE DES FILMS
+            //Dictionary<string, string> resultsParameters = new Dictionary<string, string>();
+            //var results = DataBase.Select("SELECT * FROM Films WHERE Titre LIKE '%" + query + "%'",
+            //                               resultsParameters);
+            //RootObject rootObject = new RootObject();
+            //for (int i = 0; i < results.Rows.Count; i++)
+            //{
+            //    string Titre = results.Rows[i][1].ToString();
+            //    string synopsis = results.Rows[i][2].ToString();
+            //    string dateSortie = results.Rows[i][3].ToString();
+            //    int duree = Convert.ToInt32(results.Rows[i][4]);
+            //    string Url_Affiche = results.Rows[i][5].ToString();
+            //    string url_BandeAnnoce = results.Rows[i][6].ToString();
+            //    int Id_genre = Convert.ToInt32(results.Rows[i][7]);
 
-                rootObject.films.Add(new Films(Titre, synopsis, dateSortie, duree, Url_Affiche, url_BandeAnnoce, Id_genre));
-            }
-            rootObject.totalFilms = rootObject.films.Count;
+            //    rootObject.films.Add(new Films(Titre, synopsis, dateSortie, duree, Url_Affiche, url_BandeAnnoce, Id_genre));
+            //}
+            //rootObject.totalFilms = rootObject.films.Count;
 
-            return rootObject;
+            return null;
         }
 
         // GET: api/SearchMovies/5
