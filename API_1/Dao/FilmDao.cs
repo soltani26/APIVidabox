@@ -8,13 +8,16 @@ using System.Web;
 
 namespace API_1.Dao
 {
+    /// <summary>
+    /// Permet d'ajouter, de supprimer et de récupérer la liste des films dans la base de donnée
+    /// </summary>
     public class FilmDAO
     {
         /// <summary>
-        /// Met à jour la liste des séries
+        /// Permet de récupèrer la liste de tous les films
         /// </summary>
         /// <returns></returns>
-        public static List<Film> upDateListFilms()
+        public static List<Film> listFilms()
         {
             string req = "select * from Films";
             var results = DataBase.select(req, new Dictionary<string, string>());
@@ -41,7 +44,7 @@ namespace API_1.Dao
         }
 
         /// <summary>
-        /// Ajoute l'ensemble des données des films depuis l'api distante vers l'api locale
+        /// Ajoute l'ensemble des données des films depuis l'api distante vers l'api locale si aucun résultat n'a été trouvé dans la base de donnée
         /// </summary>
         /// <param name="query"></param>
         /// <param name="page"></param>
@@ -65,13 +68,15 @@ namespace API_1.Dao
                     var itemsDetails = JsonConvert.DeserializeObject<Film.Details.RootObject>(jsonDetails);
 
                     // on enregistre dans les variables les valeurs de chaque champs
-                    var titre = item.original_title;
+                    var titre = item.title;
                     var synopsis = item.overview;
                     var date_sortie = itemsDetails.release_date;
                     if (date_sortie == null || date_sortie.Count() < 4)
                         date_sortie = "2000-01-01";
                     var url_affiche = itemsDetails.poster_path;
-                    var duree = itemsDetails.runtime.ToString();
+                    var duree = "";
+                    if (duree != null)
+                        duree = itemsDetails.runtime.ToString();
                     if (url_affiche == null)
                         url_affiche = "";
                     var url_bande_annonce = string.Empty;
@@ -83,8 +88,6 @@ namespace API_1.Dao
                     var id_moviedb = item.id;
 
                     // on ajoute à la base de données tous les éléments
-
-                  
                     DataBase.AddFilms(titre, synopsis, date_sortie, duree, url_affiche, url_bande_annonce, id_genre, id_moviedb);
                     
                 }
@@ -93,14 +96,13 @@ namespace API_1.Dao
 
 
         /// <summary>
-        /// Met à jour les données de l'api locale à partir des résultats de l'api distante
+        /// Met à jour les données de l'api locale à partir des résultats de l'api distante si au moins un résultat est dans la base de données
         /// </summary>
         /// <param name="query"></param>
         /// <param name="page"></param>
         public static void getResultUpdate(string query, int page)
-        {
-            
-            var listeFilm = FilmDAO.upDateListFilms().Where(films => films.Titre.ToLower().Contains(query.ToLower()));
+        {     
+            var listeFilm = FilmDAO.listFilms().Where(films => films.Titre.ToLower().Contains(query.ToLower()));
             // on crée une liste contenant les titres des séries présent dans notre api locale
             List<string> listeId_ApiLocale = new List<string>();
 
@@ -126,13 +128,15 @@ namespace API_1.Dao
                         var itemsDetails = JsonConvert.DeserializeObject<Film.Details.RootObject>(jsonDetails);
 
                         // on enregistre dans les variables les valeurs de chaque champs
-                        var titre = item.original_title;
+                        var titre = item.title;
                         var synopsis = item.overview;
                         var date_sortie = itemsDetails.release_date;
                         if (date_sortie == null || date_sortie.Count() < 4)
                             date_sortie = "2000-01-01";
                         var url_affiche = itemsDetails.poster_path;
-                        var duree = itemsDetails.runtime.ToString();
+                        string duree = "0";
+                        if (itemsDetails.runtime != null)
+                            duree = itemsDetails.runtime.ToString();
                         if (url_affiche == null)
                             url_affiche = "";
                         var url_bande_annonce = string.Empty;
@@ -150,30 +154,28 @@ namespace API_1.Dao
         }
 
         /// <summary>
-        /// retourne la liste des films depuis l'api locale ou l'api distante
+        /// retourne la liste des films de notre api
         /// </summary>
         /// <param name="query"></param>
         /// <param name="page"></param>
         /// <returns></returns>
         public static IEnumerable<Film> GetResults(string query, int page)
         {
-            var listeFilms = FilmDAO.upDateListFilms().Where(films => films.Titre.ToLower().Contains(query.ToLower()));
+            var listeFilms = FilmDAO.listFilms().Where(films => films.Titre.ToLower().Contains(query.ToLower()));
 
             if (listeFilms.Count() == 0)
             {
                 GetResultAll(query, page);
-                listeFilms = FilmDAO.upDateListFilms().Where(films => films.Titre.ToLower().Contains(query.ToLower()));
+                listeFilms = FilmDAO.listFilms().Where(films => films.Titre.ToLower().Contains(query.ToLower()));
                 return listeFilms;
             }
 
             else
             {
                 getResultUpdate(query, page);
-                listeFilms = FilmDAO.upDateListFilms().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
+                listeFilms = FilmDAO.listFilms().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
                 return listeFilms;
             }
         }
-
-
     }
 }
