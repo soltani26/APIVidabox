@@ -1,13 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using System.Collections.Generic;
 
 namespace API_1.Models
 {
     public class Film
     {
-
         public int Id_Films { get; set; }
         public string Titre { get; set; }
         public string synopsis { get; set; }
@@ -18,6 +14,18 @@ namespace API_1.Models
         public int Id_genre { get; set; }
         public int Id_dbmovie { get; set; }
 
+        /// <summary>
+        /// Constructeur de la classe Film
+        /// </summary>
+        /// <param name="Id_Films"></param>
+        /// <param name="Titre"></param>
+        /// <param name="synopsis"></param>
+        /// <param name="dateSortie"></param>
+        /// <param name="duree"></param>
+        /// <param name="Url_Affiche"></param>
+        /// <param name="url_BandeAnnonce"></param>
+        /// <param name="Id_genre"></param>
+        /// <param name="Id_dbmovie"></param>
         public Film(int Id_Films, string Titre, string synopsis, string dateSortie, int duree, string Url_Affiche, string url_BandeAnnonce, int Id_genre, int Id_dbmovie)
         {
             this.Id_Films = Id_Films;
@@ -31,6 +39,25 @@ namespace API_1.Models
             this.Id_dbmovie = Id_dbmovie;
         }
 
+
+        /// <summary>
+        /// fournit les données en fonction d'une recherche depuis l'api locale
+        /// </summary>
+        public class RootObject
+        {
+            public List<Film> films { get; set; }
+            public int totalFilms { get; set; }
+
+            public RootObject()
+            {
+                films = new List<Film>();
+            }
+        }
+
+
+        /// <summary>
+        /// Fournit les données en fonction d'une recherche depuis l'api distante
+        /// </summary>
         public class Search
         {
             public class Result
@@ -60,9 +87,12 @@ namespace API_1.Models
             }
         }
 
+
+        /// <summary>
+        /// Fournit les données détaillés du film recherché depuis l'api distante
+        /// </summary>
         public class Details
         {
-            ////////DETAILS/////////
             public class Genre
             {
                 public int id { get; set; }
@@ -108,7 +138,7 @@ namespace API_1.Models
                 public List<ProductionCountry> production_countries { get; set; }
                 public string release_date { get; set; }
                 public int revenue { get; set; }
-                public int runtime { get; set; }
+                public object runtime { get; set; }
                 public List<SpokenLanguage> spoken_languages { get; set; }
                 public string status { get; set; }
                 public string tagline { get; set; }

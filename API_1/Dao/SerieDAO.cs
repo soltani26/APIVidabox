@@ -15,7 +15,7 @@ namespace API_1.Dao
         /// Met à jour la liste des séries
         /// </summary>
         /// <returns></returns>
-        public static List<Serie> upDateListSerie()
+        public static List<Serie> listSeries()
         {
             string req = "select * from Serie";
             var results = DataBase.select(req, new Dictionary<string, string>());
@@ -92,7 +92,7 @@ namespace API_1.Dao
         /// <param name="page"></param>
         public static void getResultUpdate(string query, int page)
         {
-            var listeSerie = SerieDAO.upDateListSerie().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
+            var listeSerie = SerieDAO.listSeries().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
 
             // on crée une liste contenant les titres des séries présent dans notre api locale
             List<string> listeId_ApiLocale = new List<string>();
@@ -148,19 +148,19 @@ namespace API_1.Dao
         /// <returns></returns>
         public static IEnumerable<Serie> GetResults(string query, int page)
         {
-            var listeSerie = SerieDAO.upDateListSerie().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
+            var listeSerie = SerieDAO.listSeries().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
 
             if (listeSerie.Count() == 0)
             {
                 GetResultAll(query, page);
-                listeSerie = SerieDAO.upDateListSerie().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
+                listeSerie = SerieDAO.listSeries().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
                 return listeSerie;
             }
                 
             else
             {
                 getResultUpdate(query, page);
-                listeSerie = SerieDAO.upDateListSerie().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
+                listeSerie = SerieDAO.listSeries().Where(series => series.Titre.ToLower().Contains(query.ToLower()));
                 return listeSerie;
             }
         }

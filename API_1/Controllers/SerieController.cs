@@ -14,7 +14,7 @@ namespace API_1.Controllers
         //GET: api/Serie
         public IEnumerable<Serie> Get()
         {
-            return SerieDAO.upDateListSerie();
+            return SerieDAO.listSeries();
         }
 
 
